@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Demand Forecasting</title>
+</head>
+<body style="font-family:Arial; text-align:center; padding-top:50px; background:#f2f2f2;">
+
+<h2>📊 Demand Forecasting System</h2>
+
+<a href="/logout"><button>Logout</button></a>
+
+<form method="POST" style="margin-top:20px;">
+    <input type="date" name="date" required><br><br>
+
+    <select name="product" required>
+        <option value="A">Product A</option>
+        <option value="B">Product B</option>
+        <option value="C">Product C</option>
+    </select><br><br>
+
+    <button type="submit">Predict Demand</button>
+</form>
+
+{% if prediction %}
+    <h3>Predicted Demand: {{ prediction }}</h3>
+{% endif %}
+
+{% if graph_url %}
+    <img src="data:image/png;base64,{{ graph_url }}" width="400">
+{% endif %}
+
+{% if product_name %}
+    <h4>Selected Product: {{ product_name }}</h4>
+{% endif %}
+
+</body>
+</html>
