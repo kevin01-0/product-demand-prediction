@@ -7,13 +7,14 @@ import matplotlib.dates as mdates
 import io
 import base64
 
-# ==============================
-# Load trained model
-# ==============================
-with open("demand_forecasting_model.pkl", "rb") as f:
-    model = pickle.load(f)
-
 app = Flask(__name__)
+
+# ==============================
+# LOAD MODELS
+# ==============================
+model_A = pickle.load(open("model_A.pkl", "rb"))
+model_B = pickle.load(open("model_B.pkl", "rb"))
+model_C = pickle.load(open("model_C.pkl", "rb"))
 
 # ==============================
 # HTML PAGE
@@ -65,9 +66,9 @@ HTML_PAGE = """
         <input type="date" name="date" required>
 
         <select name="product" required>
-            <option value="Product A">Product A</option>
-            <option value="Product B">Product B</option>
-            <option value="Product C">Product C</option>
+            <option value="A">Product A</option>
+            <option value="B">Product B</option>
+            <option value="C">Product C</option>
         </select>
 
         <button type="submit">Predict Demand</button>
@@ -83,7 +84,6 @@ HTML_PAGE = """
 
     {% if product_name %}
         <h4>Selected Product: {{ product_name }}</h4>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
     {% endif %}
 
 </div>
@@ -103,8 +103,20 @@ def home():
 
     if request.method == "POST":
         date_input = request.form["date"]
-        product_name = request.form["product"]
+        product_choice = request.form["product"]
 
+        # Select correct model
+        if product_choice == "A":
+            model = model_A
+            product_name = "Product A"
+        elif product_choice == "B":
+            model = model_B
+            product_name = "Product B"
+        else:
+            model = model_C
+            product_name = "Product C"
+
+        # Convert date
         date_ordinal = datetime.strptime(date_input, "%Y-%m-%d").toordinal()
 
         df = pd.DataFrame([[date_ordinal]], columns=["Date"])
@@ -129,7 +141,6 @@ def home():
         plt.savefig(img, format='png')
         img.seek(0)
         graph_url = base64.b64encode(img.getvalue()).decode()
-
         plt.close()
 
     return render_template_string(
